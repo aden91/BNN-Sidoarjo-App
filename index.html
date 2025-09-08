@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BNN - SIDOARJO</title>
+    
+    <!-- Menggunakan Tailwind CSS untuk styling modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Menggunakan font Poppins dan Lato untuk tampilan yang lebih elegan -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Lato:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Menambahkan library Leaflet.js untuk Peta -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Menambahkan library Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9sB6z4oJ+Qv74I6nLhR+w2u4u5j4x3d/q+DqNq5b5/6z4t5z4+A5+F+Zq5" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Style kustom untuk aplikasi */
+        body {
+            font-family: 'Lato', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Memberi efek scroll yang halus */
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        /* Kustomisasi scrollbar agar lebih modern */
+        .chat-window::-webkit-scrollbar { width: 6px; }
+        .chat-window::-webkit-scrollbar-track { background: #f8fafc; }
+        .chat-window::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
+        .chat-window::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+        
+        .tab-icon-active { color: #1e40af; } /* Warna biru tua BNN */
+        #map { height: 300px; border-radius: 0.5rem; }
+        
+        .bot-response ul { list-style-type: disc; margin-left: 20px; margin-top: 8px; }
+        .bot-response li { margin-bottom: 4px; }
+
+        /* --- Dark Mode Styles --- */
+        .dark {
+            background-color: #020617; /* slate-950 */
+            color: #e2e8f0; /* slate-200 */
+        }
+        .dark .bg-slate-50 { background-color: #020617; }
+        .dark .bg-white, .dark .bg-white\/80 {
+            background-color: #0f172a; /* slate-900 */
+            border-color: #1e293b; /* slate-800 */
+        }
+        .dark .text-slate-800 { color: #e2e8f0; }
+        .dark .text-slate-600 { color: #94a3b8; }
+        .dark .text-slate-500 { color: #64748b; }
+        .dark .text-slate-400 { color: #475569; }
+        .dark .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3), 0 4px 6px -4px rgba(0,0,0,0.3); }
+        .dark .shadow-md { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.4); }
+        .dark .bg-slate-100 { background-color: #1e293b; }
+        .dark .hover\:bg-slate-100:hover { background-color: #334155; }
+        .dark .border-slate-200 { border-color: #1e293b; }
+        .dark .chat-window::-webkit-scrollbar-track { background: #0f172a; }
+        .dark .chat-window::-webkit-scrollbar-thumb { background: #334155; }
+        /* Style untuk tombol bahasa aktif */
+        .lang-btn-active {
+            background-color: #1e40af; /* Warna biru tua BNN */
+            color: white;
+        }
+        .dark .lang-btn-active {
+            background-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Kontainer utama aplikasi, dibuat menyerupai tampilan mobile -->
+    <div class="max-w-md mx-auto h-screen flex flex-col bg-slate-50 shadow-2xl">
+
+        <!-- Header Aplikasi -->
+        <header class="bg-white/80 backdrop-blur-sm p-4 border-b border-slate-200 z-10">
+            <div class="flex justify-between items-center">
+                <!-- Logo BNN di Kiri -->
+                <div class="flex-shrink-0">
+                    <a href="https://www.instagram.com/infobnn_kab_sidoarjo/?hl=en" target="_blank" rel="noopener noreferrer" class="transition-transform duration-200 hover:scale-110" title="Kunjungi Instagram BNN Sidoarjo">
+                        <img src="logo-bnn.png" alt="Logo BNN" class="w-12 h-12 rounded-full shadow-md">
+                    </a>
+                </div>
+                <!-- Tengah: Judul -->
+                <div class="flex-grow text-center px-2">
+                    <div class="cursor-pointer" onclick="showTab('chat')">
+                        <h1 class="text-2xl font-bold text-blue-800" data-translate-key="app_title">BNN SIDOARJO</h1>
+                        <p class="text-xs text-slate-500 mt-1" data-translate-key="app_subtitle">Bersama Mewujudkan Sidoarjo Bersih Narkoba</p>
+                    </div>
+                    <p id="datetime" class="text-[10px] text-slate-400 mt-1"></p>
+                </div>
+                <!-- Pengaturan di Kanan -->
+                <div class="flex-shrink-0 flex items-center gap-4">
+                    <div class="relative">
+                        <button id="settings-button" class="p-1 rounded-full hover:bg-slate-100">
+                            <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </button>
+                        <div id="settings-menu" class="hidden absolute top-14 right-0 bg-white rounded-xl shadow-lg p-4 w-52 z-20">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-semibold" data-translate-key="dark_mode">Mode Gelap</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="dark-mode-toggle" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div class="border-t border-slate-200 my-3"></div>
+                            <div>
+                                <h4 class="text-sm font-semibold mb-2" data-translate-key="language">Bahasa</h4>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button id="lang-btn-id" onclick="changeLanguage('id')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">Indonesia</button>
+                                    <button id="lang-btn-en" onclick="changeLanguage('en')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">English</button>
+                                    <button id="lang-btn-ja" onclick="changeLanguage('ja')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">日本語</button>
+                                    <button id="lang-btn-ko" onclick="changeLanguage('ko')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">한국어</button>
+                                    <button id="lang-btn-ru" onclick="changeLanguage('ru')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">Русский</button>
+                                    <button id="lang-btn-nl" onclick="changeLanguage('nl')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">Nederlands</button>
+                                    <button id="lang-btn-ar" onclick="changeLanguage('ar')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">العربية</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Konten Utama (dapat diganti sesuai tab) -->
+        <main class="flex-grow overflow-y-auto p-4 pb-20">
+            
+            <!-- KONTEN 1: CHATBOT (Default) -->
+            <div id="chat-content" class="h-full flex flex-col">
+                <div id="chat-window" class="flex-grow space-y-4 overflow-y-auto smooth-scroll chat-window pr-2">
+                    <div class="flex items-start gap-3">
+                        <div class="bg-blue-800 text-white p-2 rounded-full shadow-md">
+                           <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <div class="bg-white rounded-xl rounded-tl-none p-4 shadow-md">
+                                <p class="text-sm" data-translate-key="welcome_msg">Hai! Aku Kawan BNN. Pilih topik di bawah atau ketik pertanyaanmu untuk memulai.</p>
+                            </div>
+                            <div id="quick-actions" class="mt-3 flex flex-wrap gap-2">
+                                <button onclick="sendQuickAction('qa_what')" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-full transition" data-translate-key="qa_what">Apa itu Narkoba?</button>
+                                <button onclick="sendQuickAction('qa_types')" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-full transition" data-translate-key="qa_types">Jenis-jenis</button>
+                                <button onclick="sendQuickAction('qa_signs')" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-full transition" data-translate-key="qa_signs">Ciri Pengguna</button>
+                                <button onclick="sendQuickAction('qa_side_effects')" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-full transition" data-translate-key="qa_side_effects">Efek Samping</button>
+                                <button onclick="sendQuickAction('qa_law')" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-full transition" data-translate-key="qa_law">Info Hukum</button>
+                                <button onclick="sendQuickAction('qa_avoid')" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-full transition" data-translate-key="qa_avoid">Cara Menghindari</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center gap-3">
+                    <input type="text" id="chat-input" class="flex-grow bg-white border border-slate-300 rounded-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ketik pesanmu di sini...">
+                    <button id="send-button" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-3.5 rounded-full transition shadow-lg hover:shadow-xl">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KONTEN 2: SCREENING MANDIRI -->
+            <div id="screening-content" class="hidden">
+                <div id="screening-questionnaire">
+                    <h2 class="text-2xl font-bold mb-2" data-translate-key="screening_title">Screening Mandiri Narkoba</h2>
+                    <p class="text-sm text-slate-600 mb-6" data-translate-key="screening_desc">Jawab pertanyaan berikut dengan jujur. Jawabanmu bersifat anonim dan hanya untuk membantumu memahami kondisimu.</p>
+                    
+                    <div class="space-y-4 text-sm">
+                        <!-- Pertanyaan 1-10 -->
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q1">1. Dalam 3 bulan terakhir, apakah Anda pernah menggunakan obat-obatan (di luar resep dokter) untuk mengubah suasana hati?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q1" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q1" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q2">2. Apakah Anda merasa sulit mengontrol keinginan atau jumlah pemakaian zat tersebut?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q2" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q2" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q3">3. Apakah lingkungan pertemanan Anda ada yang menggunakan narkoba?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q3" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q3" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q4">4. Apakah Anda pernah berbohong kepada keluarga atau teman mengenai penggunaan zat?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q4" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q4" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q5">5. Apakah penggunaan zat tersebut mulai berdampak negatif pada sekolah, pekerjaan, atau hubungan sosial Anda?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q5" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q5" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q6">6. Pernahkah Anda merasa bersalah atau menyesal setelah menggunakan zat?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q6" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q6" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q7">7. Pernahkah orang lain (keluarga/teman) mengeluh atau mengkritik tentang kebiasaan Anda menggunakan zat?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q7" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q7" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q8">8. Pernahkah Anda menggunakan zat di pagi hari untuk memulai hari atau menghilangkan rasa tidak nyaman?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q8" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q8" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q9">9. Apakah Anda pernah gagal dalam mencoba berhenti atau mengurangi penggunaan zat?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q9" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q9" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <p class="font-semibold" data-translate-key="q10">10. Apakah Anda pernah mengabaikan tanggung jawab (sekolah, kerja, keluarga) karena penggunaan zat?</p>
+                            <div class="mt-3 flex gap-4"><label class="flex items-center gap-2"><input type="radio" name="q10" value="yes" class="form-radio text-blue-600"> <span data-translate-key="yes">Ya</span></label><label class="flex items-center gap-2"><input type="radio" name="q10" value="no" checked class="form-radio text-blue-600"> <span data-translate-key="no">Tidak</span></label></div>
+                        </div>
+                    </div>
+
+                    <button onclick="calculateScreeningResult()" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg hover:shadow-xl" data-translate-key="screening_submit">Lihat Hasil Screening</button>
+                </div>
+
+                <div id="screening-result" class="hidden">
+                    <!-- Hasil akan ditampilkan di sini oleh JavaScript -->
+                </div>
+            </div>
+
+            <!-- KONTEN 3: PETA RISIKO & POTENSI -->
+            <div id="peta-content" class="hidden">
+                <h2 class="text-2xl font-bold mb-4" data-translate-key="map_title">Peta Risiko & Potensi Sidoarjo</h2>
+                <div class="bg-white rounded-xl p-4 shadow-lg">
+                    <div id="map" class="mb-4 bg-slate-200"></div>
+                    <p class="text-sm text-slate-600 mb-4" data-translate-key="map_desc">Peta ini menunjukkan lokasi-lokasi kegiatan positif dan area yang memerlukan perhatian khusus di Sidoarjo. Data bersifat ilustratif.</p>
+                    <div class="flex justify-around">
+                        <div class="flex items-center gap-2"><div class="w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-md"></div><span class="text-xs font-semibold" data-translate-key="map_legend_positive">Zona Positif</span></div>
+                        <div class="flex items-center gap-2"><div class="w-4 h-4 bg-red-600 rounded-full border-2 border-white shadow-md"></div><span class="text-xs font-semibold" data-translate-key="map_legend_attention">Zona Perhatian</span></div>
+                    </div>
+                </div>
+                 <div id="user-info" class="mt-4 p-4 text-xs text-center text-slate-500 bg-slate-100 rounded-lg"></div>
+            </div>
+
+            <!-- KONTEN 4: LAPOR ANONIM -->
+            <div id="lapor-content" class="hidden">
+                <h2 class="text-2xl font-bold mb-4" data-translate-key="report_title">Lapor Cepat</h2>
+                <div class="bg-white rounded-xl p-4 shadow-lg">
+                    <p class="text-sm text-slate-600 mb-4" data-translate-key="report_desc">Lihat aktivitas mencurigakan? Laporkan di sini. Laporan Anda akan diteruskan ke pihak berwenang.</p>
+                    <form id="lapor-form" class="space-y-4">
+                        <div><label for="lapor-nama" class="block text-sm font-semibold text-slate-700" data-translate-key="report_name">Nama Pelapor</label><input type="text" id="lapor-nama" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nama Anda (opsional)"></div>
+                        <div><label for="lapor-telepon" class="block text-sm font-semibold text-slate-700" data-translate-key="report_phone">No. Telepon</label><input type="tel" id="lapor-telepon" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nomor yang bisa dihubungi (opsional)"></div>
+                        <div><label for="lapor-alamat" class="block text-sm font-semibold text-slate-700" data-translate-key="report_address">Alamat Pelapor</label><input type="text" id="lapor-alamat" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Alamat Anda (opsional)"></div>
+                         <div><label for="lapor-ktp" class="block text-sm font-semibold text-slate-700" data-translate-key="report_ktp">Upload Foto KTP</label><input type="file" id="lapor-ktp" accept="image/*" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                        <div><label for="lapor-deskripsi" class="block text-sm font-semibold text-slate-700" data-translate-key="report_incident_desc">Deskripsi Kejadian</label><textarea id="lapor-deskripsi" rows="4" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Jelaskan apa yang kamu lihat..." required></textarea></div>
+                        <div><label for="lapor-lokasi" class="block text-sm font-semibold text-slate-700" data-translate-key="report_incident_loc">Perkiraan Lokasi Kejadian</label><input type="text" id="lapor-lokasi" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Dekat Alun-Alun Sidoarjo" required></div>
+                        <button type="button" onclick="kirimLaporan()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg hover:shadow-xl" data-translate-key="report_button">Kirim Laporan</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- KONTEN 5: KALKULATOR KECANDUAN NIKOTIN -->
+            <div id="nikotin-content" class="hidden">
+                <h2 class="text-2xl font-bold mb-4" data-translate-key="nicotine_calc_title">Kalkulator Kecanduan Nikotin</h2>
+                <div class="bg-white rounded-xl p-4 shadow-lg">
+                    <p class="text-sm text-slate-600 mb-4" data-translate-key="nicotine_calc_desc">Masukkan data untuk mengetahui tingkat kecanduan nikotin dan dampaknya.</p>
+                    <form id="nicotine-form" class="space-y-4">
+                        <div>
+                            <label for="nicotine-mg" class="block text-sm font-semibold text-slate-700" data-translate-key="nicotine_mg">Kadar Nikotin (mg/hari)</label>
+                            <input type="number" id="nicotine-mg" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 10" required>
+                        </div>
+                        <div>
+                            <label for="nicotine-duration" class="block text-sm font-semibold text-slate-700" data-translate-key="nicotine_duration">Jumlah Pemakaian (hari/minggu)</label>
+                            <div class="flex items-center mt-1">
+                                <input type="number" id="nicotine-duration-value" class="w-full bg-slate-100 border border-slate-300 rounded-l-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 30" required>
+                                <select id="nicotine-duration-unit" class="bg-slate-200 border border-l-0 border-slate-300 rounded-r-lg p-3 text-sm">
+                                    <option value="hari">Hari</option>
+                                    <option value="minggu">Minggu</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="button" onclick="calculateNicotineAddiction()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg hover:shadow-xl" data-translate-key="nicotine_calc_button">Hitung</button>
+                    </form>
+                    <div id="nicotine-result" class="hidden mt-4 p-4 rounded-lg"></div>
+                </div>
+            </div>
+            
+            <!-- KONTEN 6: BANTUAN & KLINIK DIGITAL -->
+            <div id="bantuan-content" class="hidden">
+                <h2 class="text-2xl font-bold mb-4" data-translate-key="help_title">Bantuan & Informasi Sidoarjo</h2>
+                <div class="mb-6"><p class="text-center text-sm text-slate-600 mb-2" data-translate-key="help_emergency_desc">Butuh bantuan segera? Hubungi nomor darurat.</p>
+                    <button onclick="showEmergencyConfirmation()" class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition animate-pulse shadow-lg" data-translate-key="help_emergency_button">TOMBOL DARURAT</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div><h3 class="font-semibold mb-2 text-blue-600" data-translate-key="help_bnn_office">Kantor BNN Kabupaten Sidoarjo</h3><div class="bg-white rounded-xl p-4 text-sm shadow-lg"><p>Jalan Perum Taman Pinang, Blok AA8, Nomor 1A, Kwadengan Barat, Lemahputro, Kec. Sidoarjo, Kabupaten Sidoarjo, Jawa Timur 61213</p></div></div>
+                </div>
+
+                <h3 class="font-semibold mt-6 mb-3" data-translate-key="help_lbh_title">Layanan Hukum</h3>
+                <div class="space-y-3">
+                    <div class="bg-white rounded-xl p-4 shadow-lg"><h4 class="font-semibold text-blue-600">BNN Sidoarjo</h4><p class="text-sm text-slate-600 mt-1" data-translate-key="help_lbh_desc">Menyediakan konsultasi dan pendampingan hukum terkait kasus narkotika.</p></div>
+                </div>
+
+                <h3 class="font-semibold mt-6 mb-3" data-translate-key="help_rehab_title">Klinik & Layanan Rehabilitasi</h3>
+                <div class="space-y-3">
+                    <div class="bg-white rounded-xl p-4 shadow-lg"><h4 class="font-semibold text-blue-600">Klinik Pratama BNN Sidoarjo</h4><p class="text-sm text-slate-600 mt-1">Jl. Perum Taman Pinang Blok AA8, No. 1A, Sidoarjo</p></div>
+                    <div class="bg-white rounded-xl p-4 shadow-lg"><h4 class="font-semibold text-blue-600">RSUD Sidoarjo</h4><p class="text-sm text-slate-600 mt-1" data-translate-key="help_rsud_desc">Menyediakan layanan rehabilitasi medis.</p></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Navigasi Bawah (Tab Bar) -->
+        <footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/80 backdrop-blur-sm border-t border-slate-200">
+            <nav class="flex justify-around p-2">
+                <button id="tab-chat" onclick="showTab('chat')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition tab-icon-active">
+                    <i class="fa-solid fa-comments"></i>
+                    <span class="text-xs mt-1" data-translate-key="tab_chat">Chat</span>
+                </button>
+                <button id="tab-screening" onclick="showTab('screening')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
+                    <i class="fa-solid fa-clipboard-question"></i>
+                    <span class="text-xs mt-1" data-translate-key="tab_screening">Skrining</span>
+                </button>
+                <button id="tab-peta" onclick="showTab('peta')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span class="text-xs mt-1" data-translate-key="tab_map">Peta</span>
+                </button>
+                 <button id="tab-nikotin" onclick="showTab('nikotin')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span class="text-xs mt-1" data-translate-key="tab_nikotin">Nikotin</span>
+                </button>
+                <button id="tab-lapor" onclick="showTab('lapor')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
+                    <i class="fa-solid fa-hand-holding-medical"></i>
+                    <span class="text-xs mt-1" data-translate-key="tab_report">Lapor</span>
+                </button>
+                <button id="tab-bantuan" onclick="showTab('bantuan')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span class="text-xs mt-1" data-translate-key="tab_help">Bantuan</span>
+                </button>
+            </nav>
+        </footer>
+    </div>
+    
+    <!-- Modal untuk notifikasi umum -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-xl p-6 max-w-sm w-full text-center shadow-xl">
+            <p id="modal-message" class="text-slate-800 mb-4"></p>
+            <button onclick="closeModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition" data-translate-key="close_button">Tutup</button>
+        </div>
+    </div>
+    
+    <!-- Modal untuk konfirmasi panggilan darurat -->
+    <div id="emergency-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-xl p-6 max-w-sm w-full text-center shadow-xl">
+            <h3 class="font-bold text-lg text-red-600" data-translate-key="emergency_confirm_title">Konfirmasi Panggilan Darurat</h3>
+            <p class="text-slate-800 my-4 text-sm" data-translate-key="emergency_confirm_desc">Anda akan melakukan panggilan ke nomor darurat 112. Lanjutkan?</p>
+            <div class="flex justify-center gap-4">
+                <button onclick="hideEmergencyConfirmation()" class="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-lg transition" data-translate-key="emergency_cancel">Batal</button>
+                <button onclick="makeEmergencyCall()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition" data-translate-key="emergency_call">Ya, Panggil</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase configuration (provided by the environment)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db;
+        let auth;
+        let userId;
+        let map;
+        let mapMarkers = L.layerGroup(); // Group to manage markers
+
+        // Initialize Firebase on window load
+        window.addEventListener('load', async () => {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                // Set debug logging for Firestore
+                setLogLevel('debug');
+                
+                // Sign in the user
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Listen for auth state changes
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Authenticated with user ID:", userId);
+                        document.getElementById('user-info').textContent = `User ID: ${userId}`;
+                        setupRealtimeMapListener();
+                    } else {
+                        console.log("No user is authenticated.");
+                        document.getElementById('user-info').textContent = "Not authenticated";
+                    }
+                });
+            } catch (e) {
+                console.error("Error initializing Firebase:", e);
+                showModal("Terjadi kesalahan saat menginisialisasi layanan. Silakan coba lagi.");
+            }
+
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedLang = localStorage.getItem('language') || 'id';
+            applyTheme(savedTheme);
+            applyLanguage(savedLang);
+
+            showTab('chat');
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+        });
+
+        // --- REAL-TIME MAP LISTENER ---
+        function setupRealtimeMapListener() {
+            const reportCollectionRef = collection(db, `artifacts/${appId}/public/data/reports`);
+
+            onSnapshot(reportCollectionRef, (querySnapshot) => {
+                mapMarkers.clearLayers(); // Clear existing markers
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.location && data.location.lat && data.location.lng) {
+                         const redIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
+                        const marker = L.marker([data.location.lat, data.location.lng], {icon: redIcon})
+                            .bindPopup(`<b>Laporan:</b><br>Deskripsi: ${data.description}<br>Lokasi: ${data.address || 'Tidak diketahui'}`);
+                        mapMarkers.addLayer(marker);
+                    }
+                });
+
+                if (map) {
+                    mapMarkers.addTo(map);
+                }
+            }, (error) => {
+                console.error("Error getting real-time updates:", error);
+                showModal("Gagal memuat data laporan real-time.");
+            });
+        }
+    </script>
+
+    <script>
+        // --- DICTIONARY FOR TRANSLATIONS ---
+        const translations = {
+            'id': { 
+                "app_title": "BNN SIDOARJO", 
+                "app_subtitle": "Bersama Mewujudkan Sidoarjo Bersih Narkoba",
+                "dark_mode": "Mode Gelap", 
+                "language": "Bahasa", 
+                "welcome_msg": "Hai! Aku Kawan BNN. Pilih topik di bawah atau ketik pertanyaanmu untuk memulai.", 
+                "qa_what": "Apa itu Narkoba?", 
+                "qa_types": "Jenis-jenis", 
+                "qa_signs": "Ciri Pengguna", 
+                "qa_side_effects": "Efek Samping", 
+                "qa_law": "Info Hukum", 
+                "qa_avoid": "Cara Menghindari", 
+                "chat_placeholder": "Ketik pesanmu di sini...", 
+                "map_title": "Peta Risiko & Potensi Sidoarjo", 
+                "map_desc": "Peta ini menunjukkan lokasi-lokasi kegiatan positif dan area yang memerlukan perhatian khusus di Sidoarjo. Data bersifat ilustratif.", 
+                "map_legend_positive": "Zona Positif", 
+                "map_legend_attention": "Zona Perhatian", 
+                "report_title": "Lapor Cepat", 
+                "report_desc": "Lihat aktivitas mencurigakan? Laporkan di sini. Laporan Anda akan diteruskan ke pihak berwenang.", 
+                "report_name": "Nama Pelapor", 
+                "report_phone": "No. Telepon", 
+                "report_address": "Alamat Pelapor", 
+                "report_ktp": "Upload Foto KTP",
+                "report_incident_desc": "Deskripsi Kejadian", 
+                "report_incident_loc": "Perkiraan Lokasi Kejadian", 
+                "report_button": "Kirim Laporan", 
+                "help_title": "Bantuan & Informasi Sidoarjo", 
+                "help_emergency_desc": "Butuh bantuan segera? Hubungi nomor darurat.", 
+                "help_emergency_button": "TOMBOL DARURAT", 
+                "help_bnn_office": "Kantor BNN Kabupaten Sidoarjo", 
+                "help_lbh_title": "Layanan Hukum", 
+                "help_lbh_desc": "Menyediakan konsultasi dan pendampingan hukum terkait kasus narkotika.", 
+                "help_rehab_title": "Klinik & Layanan Rehabilitasi", 
+                "help_rsud_desc": "Menyediakan layanan rehabilitasi medis.", 
+                "tab_chat": "Chat", 
+                "tab_screening": "Skrining", 
+                "tab_map": "Peta", 
+                "tab_report": "Lapor", 
+                "tab_help": "Bantuan", 
+                "tab_nikotin": "Nikotin",
+                "close_button": "Tutup", 
+                "screening_title": "Skrining Mandiri Narkoba", 
+                "screening_desc": "Jawab pertanyaan berikut dengan jujur. Jawabanmu bersifat anonim dan hanya untuk membantumu memahami kondisimu.", 
+                "q1": "1. Dalam 3 bulan terakhir, apakah Anda pernah menggunakan obat-obatan (di luar resep dokter) untuk mengubah suasana hati?", "q2": "2. Apakah Anda merasa sulit mengontrol keinginan atau jumlah pemakaian zat tersebut?", 
+                "q3": "3. Apakah lingkungan pertemanan Anda ada yang menggunakan narkoba?", 
+                "q4": "4. Apakah Anda pernah berbohong kepada keluarga atau teman mengenai penggunaan zat?", 
+                "q5": "5. Apakah penggunaan zat tersebut mulai berdampak negatif pada sekolah, pekerjaan, atau hubungan sosial Anda?", 
+                "q6": "6. Pernahkah Anda merasa bersalah atau menyesal setelah menggunakan zat?", 
+                "q7": "7. Pernahkah orang lain (keluarga/teman) mengeluh atau mengkritik tentang kebiasaan Anda menggunakan zat?", 
+                "q8": "8. Pernahkah Anda menggunakan zat di pagi hari untuk memulai hari atau menghilangkan rasa tidak nyaman?", 
+                "q9": "9. Apakah Anda pernah gagal dalam mencoba berhenti atau mengurangi penggunaan zat?", 
+                "q10": "10. Apakah Anda pernah mengabaikan tanggung jawab (sekolah, kerja, keluarga) karena penggunaan zat?", 
+                "yes": "Ya", 
+                "no": "Tidak", 
+                "screening_submit": "Lihat Hasil Skrining", 
+                "result_low_title": "Hasil: Risiko Rendah (Sehat)", 
+                "result_low_desc": "Berdasarkan jawabanmu, kamu berada dalam kategori risiko rendah. Ini adalah kondisi yang sangat baik. Pertahankan gaya hidup sehatmu dan teruslah bergaul di lingkungan yang positif!", 
+                "result_medium_title": "Hasil: Risiko Sedang (Waspada)", 
+                "result_medium_desc": "Jawabanmu menunjukkan adanya beberapa faktor risiko. Ini adalah tanda untuk lebih waspada. Cobalah untuk mengurangi pergaulan di lingkungan yang berisiko dan perbanyak kegiatan positif. Jika merasa khawatir, jangan ragu untuk berbicara dengan orang yang kamu percaya.", 
+                "result_high_title": "Hasil: Risiko Tinggi (Segera Cari Bantuan)", 
+                "result_high_desc": "Hasil skrining menunjukkan kamu berada dalam kategori risiko tinggi. Jangan panik, ini bukan akhir segalanya. Ini adalah langkah pertama untuk menyadari bahwa kamu butuh bantuan. Sangat disarankan untuk segera berbicara dengan profesional. Klik tombol 'Bantuan' untuk melihat daftar kontak yang bisa dihubungi.", 
+                "screening_reset": "Ulangi Skrining", 
+                "emergency_confirm_title": "Konfirmasi Panggilan Darurat", 
+                "emergency_confirm_desc": "Anda akan melakukan panggilan ke nomor darurat 112. Lanjutkan?", 
+                "emergency_cancel": "Batal", 
+                "emergency_call": "Ya, Panggil",
+                "nicotine_calc_title": "Kalkulator Kecanduan Nikotin",
+                "nicotine_calc_desc": "Masukkan data untuk mengetahui tingkat kecanduan nikotin dan dampaknya.",
+                "nicotine_mg": "Kadar Nikotin (mg/hari)",
+                "nicotine_duration": "Jumlah Pemakaian",
+                "nicotine_calc_button": "Hitung",
+                "addiction_level_low": "Rendah: Potensi Kecanduan Rendah",
+                "addiction_level_medium": "Sedang: Kecanduan Sedang",
+                "addiction_level_high": "Tinggi: Kecanduan Parah",
+                "impact_low": "Dampak: Dampak kesehatan ringan, seperti batuk dan tenggorokan gatal. Disarankan untuk segera berhenti sebelum kecanduan lebih parah.",
+                "impact_medium": "Dampak: Peningkatan risiko penyakit jantung, stroke, dan masalah pernapasan. Anda mungkin mengalami gejala putus nikotin jika mencoba berhenti.",
+                "impact_high": "Dampak: Risiko tinggi penyakit kronis seperti kanker paru-paru, PPOK, dan serangan jantung. Disarankan untuk segera mencari bantuan profesional untuk berhenti merokok."
+            },
+            'en': { 
+                "app_title": "BNN SIDOARJO",
+                "app_subtitle": "Together to Achieve a Drug-Free Sidoarjo",
+                "dark_mode": "Dark Mode", 
+                "language": "Language", 
+                "welcome_msg": "Hi! I'm BNN Pal. Choose a topic below or type your question to start.", 
+                "qa_what": "What are Drugs?", 
+                "qa_types": "Types", 
+                "qa_signs": "User Signs", 
+                "qa_side_effects": "Side Effects", 
+                "qa_law": "Legal Info", 
+                "qa_avoid": "How to Avoid", 
+                "chat_placeholder": "Type your message here...", 
+                "map_title": "Sidoarjo Risk & Potential Map", 
+                "map_desc": "This map shows locations of positive activities and areas requiring special attention in Sidoarjo. Data is illustrative.", 
+                "map_legend_positive": "Positive Zone", 
+                "map_legend_attention": "Attention Zone", 
+                "report_title": "Quick Report", 
+                "report_desc": "See suspicious activity? Report it here. Your report will be forwarded to the authorities.", 
+                "report_name": "Reporter's Name", 
+                "report_phone": "Phone Number", 
+                "report_address": "Reporter's Address",
+                "report_ktp": "Upload KTP Photo",
+                "report_incident_desc": "Incident Description", 
+                "report_incident_loc": "Estimated Incident Location", 
+                "report_button": "Send Report", 
+                "help_title": "Sidoarjo Help & Information", 
+                "help_emergency_desc": "Need immediate help? Call the emergency number.", 
+                "help_emergency_button": "EMERGENCY BUTTON", 
+                "help_bnn_office": "BNN Sidoarjo Regency Office", 
+                "help_lbh_title": "Legal Services", 
+                "help_lbh_desc": "Provides legal consultation and assistance related to narcotics cases.", 
+                "help_rehab_title": "Rehabilitation Clinics & Services", 
+                "help_rsud_desc": "Provides medical rehabilitation services.", 
+                "tab_chat": "Chat", 
+                "tab_screening": "Screening", 
+                "tab_map": "Map", 
+                "tab_report": "Report", 
+                "tab_help": "Help", 
+                "tab_nikotin": "Nicotine",
+                "close_button": "Close", 
+                "screening_title": "Drug Self-Screening", 
+                "screening_desc": "Answer the following questions honestly. Your answers are anonymous and are only to help you understand your condition.", 
+                "q1": "1. In the last 3 months, have you used drugs (other than prescribed by a doctor) to change your mood?", "q2": "2. Do you find it difficult to control the desire or amount of substance use?", 
+                "q3": "3. Are there any drug users in your circle of friends?", 
+                "q4": "4. Have you ever lied to family or friends about your substance use?", 
+                "q5": "5. Has this substance use started to negatively impact your school, work, or social relationships?", 
+                "q6": "6. Have you ever felt guilty or regretful after using a substance?", 
+                "q7": "7. Have others (family/friends) complained or criticized your substance use habits?", 
+                "q8": "8. Have you ever used a substance in the morning to start your day or to get rid of discomfort?", 
+                "q9": "9. Have you ever failed in an attempt to stop or reduce substance use?", 
+                "q10": "10. Have you ever neglected your responsibilities (school, work, family) because of substance use?", 
+                "yes": "Yes", 
+                "no": "No", 
+                "screening_submit": "See Screening Results", 
+                "result_low_title": "Result: Low Risk (Healthy)", 
+                "result_low_desc": "Based on your answers, you are in the low-risk category. This is a very good condition. Maintain your healthy lifestyle and continue to engage in positive environments!", 
+                "result_medium_title": "Result: Medium Risk (Be Aware)", 
+                "result_medium_desc": "Your answers indicate some risk factors. This is a sign to be more vigilant. Try to reduce association in risky environments and increase positive activities. If you feel worried, don't hesitate to talk to someone you trust.", 
+                "result_high_title": "Result: High Risk (Seek Help Immediately)", 
+                "result_high_desc": "The screening results indicate you are in a high-risk category. Don't panic, this is not the end. This is the first step to realizing you need help. It is highly recommended to speak with a professional immediately. Click the 'Help' button to see a list of contacts.", 
+                "screening_reset": "Repeat Screening", 
+                "emergency_confirm_title": "Emergency Call Confirmation", 
+                "emergency_confirm_desc": "You are about to call the emergency number 112. Continue?", 
+                "emergency_cancel": "Cancel", 
+                "emergency_call": "Yes, Call",
+                "nicotine_calc_title": "Nicotine Addiction Calculator",
+                "nicotine_calc_desc": "Enter data to find out your level of nicotine addiction and its effects.",
+                "nicotine_mg": "Nicotine Level (mg/day)",
+                "nicotine_duration": "Usage Duration",
+                "nicotine_calc_button": "Calculate",
+                "addiction_level_low": "Low: Low Addiction Potential",
+                "addiction_level_medium": "Medium: Moderate Addiction",
+                "addiction_level_high": "High: Severe Addiction",
+                "impact_low": "Impacts: Mild health impacts, such as coughing and throat irritation. It is recommended to quit immediately before addiction worsens.",
+                "impact_medium": "Impacts: Increased risk of heart disease, stroke, and respiratory problems. You may experience nicotine withdrawal symptoms if you try to quit.",
+                "impact_high": "Impacts: High risk of chronic diseases such as lung cancer, COPD, and heart attack. It is highly recommended to seek professional help to quit smoking immediately."
+            }
+        };
+
+        // --- CORE APP LOGIC ---
+        const modal = document.getElementById('modal');
+        const modalMessage = document.getElementById('modal-message');
+        const emergencyModal = document.getElementById('emergency-modal');
+
+        function showModal(message) { modalMessage.textContent = message; modal.classList.remove('hidden'); }
+        function closeModal() { modal.classList.add('hidden'); }
+        
+        function showEmergencyConfirmation() { emergencyModal.classList.remove('hidden'); }
+        function hideEmergencyConfirmation() { emergencyModal.classList.add('hidden'); }
+        function makeEmergencyCall() { window.location.href = 'tel:112'; hideEmergencyConfirmation(); }
+
+        const tabs = ['chat', 'screening', 'peta', 'lapor', 'nikotin', 'bantuan'];
+        const tabButtons = {};
+        const tabContents = {};
+        
+        tabs.forEach(tab => {
+            tabButtons[tab] = document.getElementById(`tab-${tab}`);
+            tabContents[tab] = document.getElementById(`${tab}-content`);
+        });
+
+        function showTab(tabName) {
+            tabs.forEach(tab => {
+                tabContents[tab].classList.add('hidden');
+                tabButtons[tab].classList.remove('tab-icon-active');
+            });
+            tabContents[tabName].classList.remove('hidden');
+            tabButtons[tabName].classList.add('tab-icon-active');
+            if (tabName === 'peta' && !map) { 
+                initMap();
+            }
+        }
+
+        function initMap() {
+            const sidoarjoCoords = [-7.4478, 112.7183];
+            map = L.map('map').setView(sidoarjoCoords, 12);
+            map.on('locationfound', onLocationFound);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
+            
+            // Add a simple blue marker for the user's location
+            L.marker(sidoarjoCoords).addTo(map).bindPopup("Lokasi BNN Sidoarjo").openPopup();
+        }
+
+        // --- NEW: FUNCTION TO GET USER'S GEOLOCATION AND ADD TO MAP ---
+        function onLocationFound(e) {
+            const radius = e.accuracy / 2;
+            L.marker(e.latlng).addTo(map)
+                .bindPopup("Kamu berada di sini.").openPopup();
+            L.circle(e.latlng, radius).addTo(map);
+        }
+
+        async function kirimLaporan() {
+            if (!db) {
+                showModal("Layanan database belum terhubung. Mohon coba lagi.");
+                return;
+            }
+
+            const nama = document.getElementById('lapor-nama').value;
+            const telepon = document.getElementById('lapor-telepon').value;
+            const alamat = document.getElementById('lapor-alamat').value;
+            const ktpFile = document.getElementById('lapor-ktp').files[0];
+            const deskripsi = document.getElementById('lapor-deskripsi').value;
+            const lokasi = document.getElementById('lapor-lokasi').value;
+
+            if (!deskripsi || !lokasi) {
+                showModal('Deskripsi kejadian dan lokasi kejadian wajib diisi.');
+                return;
+            }
+
+            // Get user's current location (simulated for simplicity)
+            const location = { lat: -7.4478, lng: 112.7183 };
+
+            // Simpan data laporan ke Firestore
+            try {
+                // KTP upload is not supported in this demo. Real app needs Firebase Storage.
+                if (ktpFile) {
+                    showModal("Unggahan KTP disimulasikan. Untuk fungsionalitas penuh, diperlukan backend terpisah (misalnya Firebase Storage).");
+                }
+                
+                // Add the report to the 'reports' subcollection under the 'public' data path
+                const laporanRef = await addDoc(collection(db, `artifacts/${appId}/public/data/reports`), {
+                    reporterName: nama,
+                    reporterPhone: telepon,
+                    reporterAddress: alamat,
+                    incidentDescription: deskripsi,
+                    incidentLocation: lokasi,
+                    location: location,
+                    timestamp: new Date()
+                });
+
+                showModal(`Terima kasih. Laporan Anda telah berhasil dikirim dengan ID: ${laporanRef.id}.`);
+                document.getElementById('lapor-form').reset();
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                showModal("Terjadi kesalahan saat menyimpan laporan. Silakan coba lagi.");
+            }
+        }
+
+        const chatWindow = document.getElementById('chat-window');
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+
+        chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
+
+        async function sendMessage() {
+            const userInput = chatInput.value.trim();
+            if (userInput === '') return;
+            appendMessage(userInput, 'user');
+            chatInput.value = '';
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+            showTypingIndicator();
+            try {
+                const botResponse = await getBotResponse(userInput);
+                hideTypingIndicator();
+                appendMessage(botResponse, 'bot');
+            } catch (error) {
+                hideTypingIndicator();
+                appendMessage('Maaf, terjadi kesalahan saat menghubungi AI. Coba lagi nanti.', 'bot');
+            } finally {
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatInput.focus();
+            }
+        }
+        
+        async function sendQuickAction(key) {
+            const currentLang = localStorage.getItem('language') || 'id';
+            const displayedText = translations[currentLang][key] || key;
+            const questionInEnglish = translations['en'][key] || key;
+
+            appendMessage(displayedText, 'user');
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+            showTypingIndicator();
+            try {
+                const botResponse = await getBotResponse(questionInEnglish);
+                hideTypingIndicator();
+                appendMessage(botResponse, 'bot');
+            } catch (error) {
+                hideTypingIndicator();
+                appendMessage('Maaf, terjadi kesalahan saat menghubungi AI. Coba lagi nanti.', 'bot');
+            } finally {
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatInput.focus();
+            }
+        }
+
+        function appendMessage(message, sender) {
+            const messageElement = document.createElement('div');
+            if (sender === 'user') {
+                messageElement.className = 'flex justify-end';
+                messageElement.innerHTML = `<div class="bg-blue-500 text-white rounded-lg rounded-br-none p-3 max-w-xs shadow"><p class="text-sm">${message}</p></div>`;
+            } else {
+                messageElement.className = 'flex items-start gap-3';
+                messageElement.innerHTML = `<div class="bg-blue-800 text-white p-2 rounded-full flex-shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-white rounded-lg rounded-tl-none p-3 max-w-xs bot-response shadow-sm"><div class="text-sm text-gray-800">${message}</div></div>`;
+            }
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const typingElement = document.createElement('div');
+            typingElement.id = 'typing-indicator';
+            typingElement.className = 'flex items-start gap-3';
+            typingElement.innerHTML = `<div class="bg-blue-800 text-white p-2 rounded-full flex-shrink-0"><i class="fa-solid fa-robot"></i></div><div><div class="bg-white rounded-lg rounded-tl-none p-3 max-w-xs shadow-sm"><div class="flex items-center gap-1"><span class="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style="animation-delay: 0s;"></span><span class="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style="animation-delay: 0.1s;"></span><span class="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style="animation-delay: 0.2s;"></span></div></div></div>`;
+            chatWindow.appendChild(typingElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) typingIndicator.remove();
+        }
+
+        async function getBotResponse(userInput) {
+            const currentLang = localStorage.getItem('language') || 'id';
+            const systemPrompt = `Anda adalah "Kawan BNN", chatbot AI ramah dari BNN Sidoarjo. Jawab pertanyaan pengguna dalam bahasa ${currentLang === 'id' ? 'Indonesia' : 'English'}. Konteks: bahaya narkoba, rehabilitasi, hukum di Indonesia, cara hidup sehat. Jawab dengan empatik dan faktual. Jika ada krisis, sarankan hubungi hotline di menu Bantuan.`;
+            
+            const chatHistory = [{ role: "user", parts: [{ text: systemPrompt + "\n\nPertanyaan Pengguna: " + userInput }] }];
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = { contents: chatHistory, generationConfig: { temperature: 0.7, topK: 1, topP: 1, maxOutputTokens: 8192 } };
+
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const result = await response.json();
+
+            if (result.candidates && result.candidates[0]?.content?.parts[0]) {
+                let text = result.candidates[0].content.parts[0].text;
+                return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            } else {
+                return "Maaf, saya tidak bisa memproses jawaban saat ini. Coba lagi nanti.";
+            }
+        }
+        
+        function updateDateTime() {
+            const now = new Date();
+            const currentLang = localStorage.getItem('language') || 'id';
+            const locale = currentLang === 'id' ? 'id-ID' : currentLang;
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('datetime').textContent = now.toLocaleDateString(locale, options);
+        }
+
+        // --- DARK MODE & LANGUAGE ---
+        const settingsButton = document.getElementById('settings-button');
+        const settingsMenu = document.getElementById('settings-menu');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+        settingsButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsMenu.classList.toggle('hidden');
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!settingsMenu.contains(e.target) && !settingsButton.contains(e.target)) {
+                settingsMenu.classList.add('hidden');
+            }
+        });
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                darkModeToggle.checked = true;
+            } else {
+                document.documentElement.classList.remove('dark');
+                darkModeToggle.checked = false;
+            }
+        }
+
+        darkModeToggle.addEventListener('change', () => {
+            const theme = darkModeToggle.checked ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+            applyTheme(theme);
+        });
+
+        function applyLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            const elements = document.querySelectorAll('[data-translate-key]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-translate-key');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            document.getElementById('chat-input').placeholder = translations[lang]?.chat_placeholder || "Ketik pesanmu di sini...";
+            
+            // Update language button styles
+            const langButtons = document.querySelectorAll('#settings-menu button[id^="lang-btn-"]');
+            langButtons.forEach(btn => {
+                btn.classList.remove('lang-btn-active');
+            });
+            document.getElementById(`lang-btn-${lang}`).classList.add('lang-btn-active');
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('language', lang);
+            applyLanguage(lang);
+            updateDateTime();
+            settingsMenu.classList.add('hidden');
+        }
+        
+        // --- SCREENING LOGIC ---
+        function calculateScreeningResult() {
+            const questionnaire = document.getElementById('screening-questionnaire');
+            const resultContainer = document.getElementById('screening-result');
+            const answers = document.querySelectorAll('#screening-questionnaire input[type="radio"]:checked');
+            let score = 0;
+            answers.forEach(answer => {
+                if (answer.value === 'yes') {
+                    score++;
+                }
+            });
+
+            let resultTitleKey, resultDescKey, bgColor;
+
+            if (score <= 2) {
+                resultTitleKey = 'result_low_title';
+                resultDescKey = 'result_low_desc';
+                bgColor = 'bg-green-100 border-green-500 text-green-800';
+            } else if (score <= 5) {
+                resultTitleKey = 'result_medium_title';
+                resultDescKey = 'result_medium_desc';
+                bgColor = 'bg-yellow-100 border-yellow-500 text-yellow-800';
+            } else {
+                resultTitleKey = 'result_high_title';
+                resultDescKey = 'result_high_desc';
+                bgColor = 'bg-red-100 border-red-500 text-red-800';
+            }
+            
+            const currentLang = localStorage.getItem('language') || 'id';
+            resultContainer.innerHTML = `
+                <div class="p-4 rounded-lg border ${bgColor}">
+                    <h3 class="font-bold text-lg">${translations[currentLang][resultTitleKey]}</h3>
+                    <p class="mt-2 text-sm">${translations[currentLang][resultDescKey]}</p>
+                </div>
+                <button onclick="resetScreening()" class="mt-4 w-full bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition" data-translate-key="screening_reset">Ulangi Skrining</button>
+            `;
+
+            questionnaire.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+        }
+
+        function resetScreening() {
+            document.getElementById('screening-questionnaire').classList.remove('hidden');
+            document.getElementById('screening-result').classList.add('hidden');
+            const radioButtons = document.querySelectorAll('#screening-questionnaire input[type="radio"]');
+            radioButtons.forEach(radio => {
+                if(radio.value === 'no') radio.checked = true;
+            });
+        }
+        
+        // --- NICOTINE CALCULATOR LOGIC ---
+        function calculateNicotineAddiction() {
+            const mg = parseInt(document.getElementById('nicotine-mg').value, 10);
+            const duration = parseInt(document.getElementById('nicotine-duration-value').value, 10);
+            const unit = document.getElementById('nicotine-duration-unit').value;
+            const resultContainer = document.getElementById('nicotine-result');
+            const currentLang = localStorage.getItem('language') || 'id';
+            
+            if (isNaN(mg) || isNaN(duration) || mg <= 0 || duration <= 0) {
+                showModal('Mohon isi semua data dengan angka yang valid.');
+                return;
+            }
+
+            let totalDays = duration;
+            if (unit === 'minggu') {
+                totalDays = duration * 7;
+            }
+
+            let score = 0;
+            if (mg > 5) score++;
+            if (mg > 10) score++;
+            if (totalDays > 30) score++;
+            if (totalDays > 90) score++;
+            
+            let addictionLevelKey, impactKey, bgColor;
+
+            if (score <= 1) {
+                addictionLevelKey = 'addiction_level_low';
+                impactKey = 'impact_low';
+                bgColor = 'bg-green-100 border-green-500 text-green-800';
+            } else if (score <= 3) {
+                addictionLevelKey = 'addiction_level_medium';
+                impactKey = 'impact_medium';
+                bgColor = 'bg-yellow-100 border-yellow-500 text-yellow-800';
+            } else {
+                addictionLevelKey = 'addiction_level_high';
+                impactKey = 'impact_high';
+                bgColor = 'bg-red-100 border-red-500 text-red-800';
+            }
+
+            resultContainer.innerHTML = `
+                <div class="p-4 rounded-lg border ${bgColor}">
+                    <h3 class="font-bold text-lg">${translations[currentLang][addictionLevelKey]}</h3>
+                    <p class="mt-2 text-sm font-semibold">${translations[currentLang].impact}:</p>
+                    <p class="mt-1 text-sm">${translations[currentLang][impactKey]}</p>
+                </div>
+            `;
+            resultContainer.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
