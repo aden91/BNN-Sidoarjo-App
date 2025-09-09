@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIDOARJO BERSINAR</title>
+    <title>BNN SIDOARJO</title>
     
     <!-- Menggunakan Tailwind CSS untuk styling modern -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,30 +17,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
-
-        // Global variables for Firebase
-        window.initializeApp = initializeApp;
-        window.getAuth = getAuth;
-        window.signInAnonymously = signInAnonymously;
-        window.signInWithCustomToken = signInWithCustomToken; // Expose the function globally
-        window.getFirestore = getFirestore;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.onSnapshot = onSnapshot;
-        window.query = query;
-        window.serverTimestamp = serverTimestamp;
-        window.getStorage = getStorage;
-        window.ref = ref;
-        window.uploadBytes = uploadBytes;
-        window.getDownloadURL = getDownloadURL;
-    </script>
+    <!-- Menggunakan Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
         /* Style kustom untuk aplikasi */
@@ -66,12 +44,6 @@
         
         .bot-response ul { list-style-type: disc; margin-left: 20px; margin-top: 8px; }
         .bot-response li { margin-bottom: 4px; }
-        .chat-message-image {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 0.5rem;
-            margin-top: 8px;
-        }
 
         /* --- Dark Mode Styles --- */
         .dark {
@@ -112,29 +84,29 @@
         <!-- Header Aplikasi -->
         <header class="bg-white/80 backdrop-blur-sm p-4 border-b border-slate-200 z-10">
             <div class="flex justify-between items-center">
-                <!-- Logo BNN di Kiri -->
+                <!-- Logo BNN Sidoarjo di Kiri -->
                 <div class="flex-shrink-0">
-                    <a href="https://www.instagram.com/infobnn_kab_sidoarjo/?hl=en" target="_blank" rel="noopener noreferrer" class="transition-transform duration-200 hover:scale-110" title="Kunjungi Instagram BNN Sidoarjo">
+                     <a href="https://www.instagram.com/infobnn_kab_sidoarjo/?hl=en" target="_blank" rel="noopener noreferrer" class="transition-transform duration-200 hover:scale-110" title="Kunjungi Instagram BNN Sidoarjo">
                         <img src="logo-bnn.png" alt="Logo BNN" class="w-12 h-12 rounded-full shadow-md">
                     </a>
                 </div>
                 <!-- Tengah: Judul -->
                 <div class="flex-grow text-center px-2">
                     <div class="cursor-pointer" onclick="showTab('chat')">
-                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent" data-translate-key="app_title">SIDOARJO BERSINAR</h1>
-                        <p class="text-xs text-slate-500 mt-1" data-translate-key="app_subtitle">Bersih Narkoba, Sehat, dan Produktif</p>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent" data-translate-key="app_title">BNN SIDOARJO</h1>
+                        <p class="text-xs text-slate-500 mt-1" data-translate-key="app_subtitle">Bersama Berantas Narkoba</p>
                     </div>
                     <p id="datetime" class="text-[10px] text-slate-400 mt-1"></p>
                 </div>
-                <!-- Pengaturan di Kanan -->
+                <!-- Logo PSI & Pengaturan di Kanan -->
                 <div class="flex-shrink-0 flex items-center gap-4">
-                    <div class="relative">
+                     <div class="relative">
                         <button id="settings-button" class="p-1 rounded-full hover:bg-slate-100">
                             <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         </button>
                         <div id="settings-menu" class="hidden absolute top-14 right-0 bg-white rounded-xl shadow-lg p-4 w-52 z-20">
                             <div class="flex items-center justify-between">
-                                <span class="text-sm font-semibold" data-translate-key="dark_mode">Mode Gelap</span>
+                                <span class="text-sm font-semibold" data-translate-key="dark_mode">Dark Mode</span>
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="dark-mode-toggle" class="sr-only peer">
                                     <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -146,6 +118,11 @@
                                 <div class="grid grid-cols-2 gap-2">
                                     <button id="lang-btn-id" onclick="changeLanguage('id')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">Indonesia</button>
                                     <button id="lang-btn-en" onclick="changeLanguage('en')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">English</button>
+                                    <button id="lang-btn-ja" onclick="changeLanguage('ja')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">日本語</button>
+                                    <button id="lang-btn-ko" onclick="changeLanguage('ko')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">한국어</button>
+                                    <button id="lang-btn-ru" onclick="changeLanguage('ru')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">Русский</button>
+                                    <button id="lang-btn-nl" onclick="changeLanguage('nl')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">Nederlands</button>
+                                    <button id="lang-btn-ar" onclick="changeLanguage('ar')" class="w-full text-center text-sm p-2 rounded-md border border-slate-300">العربية</button>
                                 </div>
                             </div>
                         </div>
@@ -166,7 +143,7 @@
                         </div>
                         <div>
                             <div class="bg-white rounded-xl rounded-tl-none p-4 shadow-md">
-                                <p class="text-sm" data-translate-key="welcome_msg">Hai! Aku chatbot resmi BNN Sidoarjo. Pilih topik di bawah atau ketik pertanyaanmu untuk memulai.</p>
+                                <p class="text-sm" data-translate-key="welcome_msg">Hai! Aku KAWAN BISA. Pilih topik di bawah atau ketik pertanyaanmu untuk memulai.</p>
                             </div>
                             <div id="quick-actions" class="mt-3 flex flex-wrap gap-2">
                                 <button onclick="sendQuickAction('qa_what')" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-full transition" data-translate-key="qa_what">Apa itu Narkoba?</button>
@@ -245,106 +222,74 @@
                 </div>
             </div>
 
-            <!-- KONTEN 3: KALKULATOR NIKOTIN BARU -->
-            <div id="nikotin-content" class="hidden">
-                <h2 class="text-2xl font-bold mb-4">Kalkulator Kecanduan Nikotin</h2>
+            <!-- KONTEN 3: KALKULATOR KECANDUAN NIKOTIN -->
+            <div id="kalkulator-content" class="hidden">
+                <h2 class="text-2xl font-bold mb-4" data-translate-key="calculator_title">Kalkulator Kecanduan Nikotin</h2>
                 <div class="bg-white rounded-xl p-4 shadow-lg">
-                    <p class="text-sm text-slate-600 mb-4">Masukkan data penggunaan rokok Anda untuk mengetahui tingkat kecanduan nikotin dan dampaknya.</p>
-                    <div class="space-y-4">
+                    <p class="text-sm text-slate-600 mb-4" data-translate-key="calculator_desc">Masukkan data untuk mengetahui tingkat kecanduan nikotin Anda.</p>
+                    <form id="nicotine-form" class="space-y-4">
                         <div>
-                            <label for="nicotine-level" class="block text-sm font-semibold text-slate-700">Kadar Nikotin (mg/batang)</label>
-                            <input type="number" id="nicotine-level" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 0.8" step="0.1" required>
+                            <label for="nicotine-level" class="block text-sm font-semibold text-slate-700" data-translate-key="calculator_nicotine_level">Kadar Nikotin (mg)</label>
+                            <input type="number" id="nicotine-level" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
                         <div>
-                            <label for="cigarette-count" class="block text-sm font-semibold text-slate-700">Jumlah Rokok per Hari (batang)</label>
-                            <input type="number" id="cigarette-count" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 10" required>
+                            <label for="usage-days" class="block text-sm font-semibold text-slate-700" data-translate-key="calculator_usage_days">Jumlah Pemakaian (hari)</label>
+                            <input type="number" id="usage-days" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
-                        <div>
-                            <label for="duration" class="block text-sm font-semibold text-slate-700">Durasi Penggunaan</label>
-                            <select id="duration-unit" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                <option value="days">Hari</option>
-                                <option value="weeks">Minggu</option>
-                                <option value="months">Bulan</option>
-                                <option value="years">Tahun</option>
-                            </select>
-                            <input type="number" id="duration" class="w-full mt-2 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan angka durasi" required>
-                        </div>
-                        <button onclick="calculateNicotineAddiction()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg hover:shadow-xl">Hitung Kecanduan</button>
-                    </div>
-                </div>
-                <div id="nicotine-result" class="hidden mt-4 bg-white p-4 rounded-xl shadow-lg">
-                    <!-- Hasil akan ditampilkan di sini -->
+                        <button type="button" onclick="calculateNicotineAddiction()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg hover:shadow-xl" data-translate-key="calculator_button">Hitung Kecanduan</button>
+                    </form>
+                    <div id="nicotine-result" class="mt-4 p-4 rounded-lg hidden"></div>
                 </div>
             </div>
 
-            <!-- KONTEN 4: LAPOR ANONIM DENGAN UNGGAH KTP -->
+            <!-- KONTEN 4: PETA RISIKO & POTENSI -->
+            <div id="peta-content" class="hidden">
+                <h2 class="text-2xl font-bold mb-4" data-translate-key="map_title">Peta Risiko & Potensi Sidoarjo</h2>
+                <div class="bg-white rounded-xl p-4 shadow-lg">
+                    <div id="map" class="mb-4 bg-slate-200"></div>
+                    <p class="text-sm text-slate-600 mb-4" data-translate-key="map_desc">Peta ini menunjukkan lokasi-lokasi kegiatan positif dan area yang memerlukan perhatian khusus di Sidoarjo. Data bersifat ilustratif.</p>
+                    <div class="flex justify-around">
+                        <div class="flex items-center gap-2"><div class="w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-md"></div><span class="text-xs font-semibold" data-translate-key="map_legend_positive">Zona Positif</span></div>
+                        <div class="flex items-center gap-2"><div class="w-4 h-4 bg-yellow-400 rounded-full border-2 border-white shadow-md"></div><span class="text-xs font-semibold" data-translate-key="map_legend_attention">Zona Perhatian</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KONTEN 5: LAPOR ANONIM -->
             <div id="lapor-content" class="hidden">
                 <h2 class="text-2xl font-bold mb-4" data-translate-key="report_title">Lapor Cepat</h2>
                 <div class="bg-white rounded-xl p-4 shadow-lg">
-                    <p class="text-sm text-slate-600 mb-4" data-translate-key="report_desc">Lihat aktivitas mencurigakan? Laporkan di sini. Laporan Anda akan diteruskan ke pihak berwenang. Unggah foto KTP diperlukan untuk verifikasi identitas.</p>
+                    <p class="text-sm text-slate-600 mb-4" data-translate-key="report_desc">Lihat aktivitas mencurigakan? Laporkan di sini. Laporan Anda akan diteruskan ke pihak berwenang.</p>
                     <form id="lapor-form" class="space-y-4">
-                        <div>
-                            <label for="lapor-nama" class="block text-sm font-semibold text-slate-700" data-translate-key="report_name">Nama Pelapor</label>
-                            <input type="text" id="lapor-nama" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nama Anda (opsional)">
-                        </div>
-                        <div>
-                            <label for="lapor-telepon" class="block text-sm font-semibold text-slate-700" data-translate-key="report_phone">No. Telepon</label>
-                            <input type="tel" id="lapor-telepon" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nomor yang bisa dihubungi (opsional)">
-                        </div>
-                        <div>
-                            <label for="lapor-deskripsi" class="block text-sm font-semibold text-slate-700" data-translate-key="report_incident_desc">Deskripsi Kejadian</label>
-                            <textarea id="lapor-deskripsi" rows="4" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Jelaskan apa yang kamu lihat..." required></textarea>
-                        </div>
-                        <div>
-                            <label for="lapor-lokasi" class="block text-sm font-semibold text-slate-700" data-translate-key="report_incident_loc">Perkiraan Lokasi Kejadian</label>
-                            <input type="text" id="lapor-lokasi" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Dekat Alun-Alun Sidoarjo" required>
-                        </div>
-                        <div>
-                            <label for="lapor-ktp" class="block text-sm font-semibold text-slate-700">Unggah Foto KTP</label>
-                            <input type="file" id="lapor-ktp" accept="image/*" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <p class="text-xs text-slate-500 mt-1">Format: JPG, PNG. Ukuran maks. 2MB.</p>
+                        <div><label for="lapor-nama" class="block text-sm font-semibold text-slate-700" data-translate-key="report_name">Nama Pelapor</label><input type="text" id="lapor-nama" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nama Anda (opsional)"></div>
+                        <div><label for="lapor-telepon" class="block text-sm font-semibold text-slate-700" data-translate-key="report_phone">No. Telepon</label><input type="tel" id="lapor-telepon" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nomor yang bisa dihubungi (opsional)"></div>
+                        <div><label for="lapor-alamat" class="block text-sm font-semibold text-slate-700" data-translate-key="report_address">Alamat Pelapor</label><input type="text" id="lapor-alamat" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Alamat Anda (opsional)"></div>
+                        <div><label for="lapor-deskripsi" class="block text-sm font-semibold text-slate-700" data-translate-key="report_incident_desc">Deskripsi Kejadian</label><textarea id="lapor-deskripsi" rows="4" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Jelaskan apa yang kamu lihat..." required></textarea></div>
+                        <div><label for="lapor-lokasi" class="block text-sm font-semibold text-slate-700" data-translate-key="report_incident_loc">Perkiraan Lokasi Kejadian</label><input type="text" id="lapor-lokasi" class="w-full mt-1 bg-slate-100 border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Dekat Alun-Alun Sidoarjo" required></div>
+                        <div class="border-t border-slate-200 mt-4 pt-4">
+                            <label for="ktp-upload" class="block text-sm font-semibold text-slate-700 mb-2">Unggah Foto KTP (Opsional)</label>
+                            <input type="file" id="ktp-upload" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                         </div>
                         <button type="button" onclick="kirimLaporan()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg hover:shadow-xl" data-translate-key="report_button">Kirim Laporan</button>
                     </form>
                 </div>
             </div>
             
-            <!-- KONTEN 5: BANTUAN & KLINIK DIGITAL -->
+            <!-- KONTEN 6: BANTUAN & KLINIK DIGITAL -->
             <div id="bantuan-content" class="hidden">
-                <h2 class="text-2xl font-bold mb-4" data-translate-key="help_title">Bantuan & Informasi BNN</h2>
-                <div class="mb-6">
-                    <p class="text-center text-sm text-slate-600 mb-2" data-translate-key="help_emergency_desc">Butuh bantuan segera? Hubungi nomor darurat.</p>
+                <h2 class="text-2xl font-bold mb-4" data-translate-key="help_title">Bantuan & Informasi Sidoarjo</h2>
+                <div class="mb-6"><p class="text-center text-sm text-slate-600 mb-2" data-translate-key="help_emergency_desc">Butuh bantuan segera? Hubungi nomor darurat.</p>
                     <button onclick="showEmergencyConfirmation()" class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition animate-pulse shadow-lg" data-translate-key="help_emergency_button">TOMBOL DARURAT</button>
                 </div>
                 
                 <div class="space-y-4">
-                    <div>
-                        <h3 class="font-semibold mb-2 text-blue-600" data-translate-key="help_bnn_office">Kantor BNN Kabupaten Sidoarjo</h3>
-                        <div class="bg-white rounded-xl p-4 text-sm shadow-lg">
-                            <p>Jalan Perum Taman Pinang, Blok AA8, Nomor 1A, Kwadengan Barat, Lemahputro, Kec. Sidoarjo, Kabupaten Sidoarjo, Jawa Timur 61213</p>
-                            <p class="mt-2 font-semibold">Telepon: (031) 895 2445</p>
-                        </div>
-                    </div>
-                </div>
-
-                <h3 class="font-semibold mt-6 mb-3" data-translate-key="help_lbh_title">Lembaga Bantuan Hukum (LBH)</h3>
-                <div class="space-y-3">
-                    <div class="bg-white rounded-xl p-4 shadow-lg">
-                        <h4 class="font-semibold text-blue-600">LBH Sidoarjo</h4>
-                        <p class="text-sm text-slate-600 mt-1" data-translate-key="help_lbh_desc">Menyediakan konsultasi dan pendampingan hukum. (Alamat & kontak perlu diverifikasi lebih lanjut)</p>
-                    </div>
+                    <div><h3 class="font-semibold mb-2 text-red-600" data-translate-key="help_psi_office">Kantor DPD BNN Sidoarjo</h3><div class="bg-white rounded-xl p-4 text-sm shadow-lg"><p>Jalan Perum Taman Pinang, Blok AA8, Nomor 1A, Kwadengan Barat, Lemahputro, Kec. Sidoarjo, Kabupaten Sidoarjo, Jawa Timur 61213</p><p class="mt-2 font-semibold" data-translate-key="help_psi_contact">Kontak: (031) 8072481</p></div></div>
                 </div>
 
                 <h3 class="font-semibold mt-6 mb-3" data-translate-key="help_rehab_title">Klinik & Layanan Rehabilitasi</h3>
                 <div class="space-y-3">
-                    <div class="bg-white rounded-xl p-4 shadow-lg">
-                        <h4 class="font-semibold text-blue-600">Klinik Pratama BNN Sidoarjo</h4>
-                        <p class="text-sm text-slate-600 mt-1">Jl. Perum Taman Pinang Blok AA8, No. 1A, Sidoarjo</p>
-                    </div>
-                    <div class="bg-white rounded-xl p-4 shadow-lg">
-                        <h4 class="font-semibold text-blue-600">RSUD Sidoarjo</h4>
-                        <p class="text-sm text-slate-600 mt-1" data-translate-key="help_rsud_desc">Menyediakan layanan rehabilitasi medis.</p>
-                    </div>
+                    <div class="bg-white rounded-xl p-4 shadow-lg"><h4 class="font-semibold text-blue-600">Klinik Pratama BNN Sidoarjo</h4><p class="text-sm text-slate-600 mt-1">Jl. Perum Taman Pinang Blok AA8, No. 1A, Sidoarjo</p></div>
+                    <div class="bg-white rounded-xl p-4 shadow-lg"><h4 class="font-semibold text-blue-600">RSUD Sidoarjo</h4><p class="text-sm text-slate-600 mt-1" data-translate-key="help_rsud_desc">Menyediakan layanan rehabilitasi medis.</p></div>
                 </div>
             </div>
         </main>
@@ -359,18 +304,12 @@
                     </svg>
                     <span class="text-xs mt-1" data-translate-key="tab_screening">Screening</span>
                 </button>
-                <button id="tab-nikotin" onclick="showTab('nikotin')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                        <path fill-rule="evenodd" d="M11.484 2.17a.75.75 0 0 1 1.032 0 11.209 11.209 0 0 0-1.742 2.766c-.662.662-1.24 1.39-1.777 2.163-.985 1.433-.72 3.5.768 4.908.734.693 1.638 1.137 2.607 1.254.898.109 1.838-.13 2.651-.899l.487-.457a1.65 1.65 0 0 1 2.257.069.93.93 0 0 1 .069 1.353l-.458.487a5.552 5.552 0 0 1-4.706 1.488 6.551 6.551 0 0 1-5.698-1.571 5.437 5.437 0 0 1-1.572-5.697c.18-.847.534-1.66 1.054-2.427A9.754 9.754 0 0 1 11.484 2.17ZM8.347 18.23c1.78.291 3.529-.395 4.888-1.722a.75.75 0 0 0-1.03-1.082 3.75 3.75 0 0 1-5.187 1.13c-.946-.665-1.536-1.758-1.536-2.906a2.25 2.25 0 0 1 2.25-2.25c.677 0 1.293.268 1.755.704a.75.75 0 0 0 1.06-1.06 4.5 4.5 0 0 0-2.476-1.28l-.348-.046c-.62.008-1.238.118-1.84.32a.75.75 0 1 0 .614 1.341c.421-.144.856-.25 1.298-.316a.75.75 0 0 0-.173 1.488 3.75 3.75 0 0 1-.772 1.96 5.252 5.252 0 0 0 2.57 2.57Z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-xs mt-1">Nikotin</span>
+                <button id="tab-kalkulator" onclick="showTab('kalkulator')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
+                    <i class="fa-solid fa-calculator text-lg"></i>
+                    <span class="text-xs mt-1" data-translate-key="tab_calculator">Kalkulator</span>
                 </button>
-                <button id="tab-lapor" onclick="showTab('lapor')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                    </svg>
-                    <span class="text-xs mt-1" data-translate-key="tab_report">Lapor</span>
-                </button>
+                <button id="tab-peta" onclick="showTab('peta')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.5-10.5h-7a2.25 2.25 0 0 0-2.25 2.25v10.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25V8.25a2.25 2.25 0 0 0-2.25-2.25H15M3 12h3m12 0h3" /></svg><span class="text-xs mt-1" data-translate-key="tab_map">Peta</span></button>
+                <button id="tab-lapor" onclick="showTab('lapor')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg><span class="text-xs mt-1" data-translate-key="tab_report">Lapor</span></button>
                 <button id="tab-bantuan" onclick="showTab('bantuan')" class="tab-button flex flex-col items-center text-slate-500 hover:text-blue-600 transition"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg><span class="text-xs mt-1" data-translate-key="tab_help">Bantuan</span></button>
             </nav>
         </footer>
@@ -396,10 +335,86 @@
         </div>
     </div>
 
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        let db, auth, storage, userId;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        async function initFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                storage = getStorage(app);
+
+                if (authToken) {
+                    await signInWithCustomToken(auth, authToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                userId = auth.currentUser.uid;
+                console.log("Signed in to Firebase successfully.");
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+            }
+        }
+        initFirebase();
+
+        window.kirimLaporan = async () => {
+            const nama = document.getElementById('lapor-nama').value;
+            const telepon = document.getElementById('lapor-telepon').value;
+            const alamat = document.getElementById('lapor-alamat').value;
+            const deskripsi = document.getElementById('lapor-deskripsi').value;
+            const lokasi = document.getElementById('lapor-lokasi').value;
+            const ktpFile = document.getElementById('ktp-upload').files[0];
+
+            if (!deskripsi || !lokasi) {
+                showModal('Deskripsi kejadian dan lokasi kejadian wajib diisi.');
+                return;
+            }
+
+            try {
+                showModal('Mengirim laporan...');
+
+                let ktpUrl = null;
+                if (ktpFile) {
+                    const storageRef = ref(storage, `laporan_ktp/${userId}/${Date.now()}-${ktpFile.name}`);
+                    const uploadTask = await uploadBytes(storageRef, ktpFile);
+                    ktpUrl = await getDownloadURL(uploadTask.ref);
+                }
+
+                await addDoc(collection(db, `artifacts/${appId}/public/data/laporan`), {
+                    nama: nama || 'Anonim',
+                    telepon: telepon || 'Anonim',
+                    alamat: alamat || 'Anonim',
+                    deskripsi,
+                    lokasi,
+                    ktpUrl,
+                    userId,
+                    timestamp: serverTimestamp()
+                });
+
+                showModal('Laporan Anda berhasil dikirim! Terima kasih atas partisipasinya.');
+                document.getElementById('lapor-form').reset();
+            } catch (error) {
+                console.error("Error adding document or uploading file: ", error);
+                showModal('Gagal mengirim laporan. Silakan coba lagi.');
+            }
+        };
+    </script>
+
     <script>
         // --- DICTIONARY FOR TRANSLATIONS ---
         const translations = {
-            'id': { "app_title": "SIDOARJO BERSINAR", "app_subtitle": "Bersih Narkoba, Sehat, dan Produktif", "dark_mode": "Mode Gelap", "language": "Bahasa", "welcome_msg": "Hai! Aku chatbot resmi BNN Sidoarjo. Pilih topik di bawah atau ketik pertanyaanmu untuk memulai.", "qa_what": "Apa itu Narkoba?", "qa_types": "Jenis-jenis", "qa_signs": "Ciri Pengguna", "qa_side_effects": "Efek Samping", "qa_law": "Info Hukum", "qa_avoid": "Cara Menghindari", "chat_placeholder": "Ketik pesanmu di sini...", "report_title": "Lapor Cepat", "report_desc": "Lihat aktivitas mencurigakan? Laporkan di sini. Laporan Anda akan diteruskan ke pihak berwenang. Unggah foto KTP diperlukan untuk verifikasi identitas.", "report_name": "Nama Pelapor", "report_phone": "No. Telepon", "report_address": "Alamat Pelapor", "report_incident_desc": "Deskripsi Kejadian", "report_incident_loc": "Perkiraan Lokasi Kejadian", "report_button": "Kirim Laporan", "help_title": "Bantuan & Informasi BNN", "help_emergency_desc": "Butuh bantuan segera? Hubungi nomor darurat.", "help_emergency_button": "TOMBOL DARURAT", "help_bnn_office": "Kantor BNN Kabupaten Sidoarjo", "help_lbh_title": "Lembaga Bantuan Hukum (LBH)", "help_lbh_desc": "Menyediakan konsultasi dan pendampingan hukum. (Alamat & kontak perlu diverifikasi lebih lanjut)", "help_rehab_title": "Klinik & Layanan Rehabilitasi", "help_rsud_desc": "Menyediakan layanan rehabilitasi medis.", "tab_chat": "Chat", "tab_screening": "Screening", "tab_report": "Lapor", "tab_help": "Bantuan", "tab_nikotin": "Nikotin", "close_button": "Tutup", "screening_title": "Screening Mandiri", "screening_desc": "Jawab pertanyaan berikut dengan jujur. Jawabanmu bersifat anonim dan hanya untuk membantumu memahami kondisimu.", "q1": "1. Dalam 3 bulan terakhir, apakah Anda pernah menggunakan obat-obatan (di luar resep dokter) untuk mengubah suasana hati?", "q2": "2. Apakah Anda merasa sulit mengontrol keinginan atau jumlah pemakaian zat tersebut?", "q3": "3. Apakah lingkungan pertemanan Anda ada yang menggunakan narkoba?", "q4": "4. Apakah Anda pernah berbohong kepada keluarga atau teman mengenai penggunaan zat?", "q5": "5. Apakah penggunaan zat tersebut mulai berdampak negatif pada sekolah, pekerjaan, atau hubungan sosial Anda?", "q6": "6. Pernahkah Anda merasa bersalah atau menyesal setelah menggunakan zat?", "q7": "7. Pernahkah orang lain (keluarga/teman) mengeluh atau mengkritik tentang kebiasaan Anda menggunakan zat?", "q8": "8. Pernahkah Anda menggunakan zat di pagi hari untuk memulai hari atau menghilangkan rasa tidak nyaman?", "q9": "9. Apakah Anda pernah gagal dalam mencoba berhenti atau mengurangi penggunaan zat?", "q10": "10. Apakah Anda pernah mengabaikan tanggung jawab (sekolah, kerja, keluarga) karena penggunaan zat?", "yes": "Ya", "no": "Tidak", "screening_submit": "Lihat Hasil Screening", "result_low_title": "Hasil: Risiko Rendah (Sehat)", "result_low_desc": "Berdasarkan jawabanmu, kamu berada dalam kategori risiko rendah. Ini adalah kondisi yang sangat baik. Pertahankan gaya hidup sehatmu dan teruslah bergaul di lingkungan yang positif!", "result_medium_title": "Hasil: Risiko Sedang (Waspada)", "result_medium_desc": "Jawabanmu menunjukkan adanya beberapa faktor risiko. Ini adalah tanda untuk lebih waspada. Cobalah untuk mengurangi pergaulan di lingkungan yang berisiko dan perbanyak kegiatan positif. Jika merasa khawatir, jangan ragu untuk berbicara dengan orang yang kamu percaya.", "result_high_title": "Hasil: Risiko Tinggi (Segera Cari Bantuan)", "result_high_desc": "Hasil screening menunjukkan kamu berada dalam kategori risiko tinggi. Jangan panik, ini bukan akhir segalanya. Ini adalah langkah pertama untuk menyadari bahwa kamu butuh bantuan. Sangat disarankan untuk segera berbicara dengan profesional. Klik tombol 'Bantuan' untuk melihat daftar kontak yang bisa dihubungi.", "screening_reset": "Ulangi Screening", "emergency_confirm_title": "Konfirmasi Panggilan Darurat", "emergency_confirm_desc": "Anda akan melakukan panggilan ke nomor darurat 112. Lanjutkan?", "emergency_cancel": "Batal", "emergency_call": "Ya, Panggil" }
+            'id': { "app_title": "BNN SIDOARJO", "app_subtitle": "Bersama Berantas Narkoba", "dark_mode": "Mode Gelap", "language": "Bahasa", "welcome_msg": "Hai! Aku BNN AI. Pilih topik di bawah atau ketik pertanyaanmu untuk memulai.", "qa_what": "Apa itu Narkoba?", "qa_types": "Jenis-jenis", "qa_signs": "Ciri Pengguna", "qa_side_effects": "Efek Samping", "qa_law": "Info Hukum", "qa_avoid": "Cara Menghindari", "chat_placeholder": "Ketik pesanmu di sini...", "map_title": "Peta Risiko & Potensi Sidoarjo", "map_desc": "Peta ini menunjukkan lokasi-lokasi kegiatan positif dan area yang memerlukan perhatian khusus di Sidoarjo. Data bersifat ilustratif.", "map_legend_positive": "Zona Positif", "map_legend_attention": "Zona Perhatian", "report_title": "Lapor Cepat", "report_desc": "Lihat aktivitas mencurigakan? Laporkan di sini. Laporan Anda akan diteruskan ke pihak berwenang.", "report_name": "Nama Pelapor", "report_phone": "No. Telepon", "report_address": "Alamat Pelapor", "report_incident_desc": "Deskripsi Kejadian", "report_incident_loc": "Perkiraan Lokasi Kejadian", "report_button": "Kirim Laporan", "help_title": "Bantuan & Informasi Sidoarjo", "help_emergency_desc": "Butuh bantuan segera? Hubungi nomor darurat.", "help_emergency_button": "TOMBOL DARURAT", "help_psi_office": "Kantor BNN Sidoarjo", "help_psi_contact": "Kontak: (031) 8072481", "help_bnn_office": "Kantor BNN Kabupaten Sidoarjo", "help_lbh_title": "Lembaga Bantuan Hukum (LBH)", "help_lbh_desc": "Menyediakan konsultasi dan pendampingan hukum. (Alamat & kontak perlu diverifikasi lebih lanjut)", "help_rehab_title": "Klinik & Layanan Rehabilitasi", "help_rsud_desc": "Menyediakan layanan rehabilitasi medis.", "tab_chat": "Chat", "tab_screening": "Screening", "tab_calculator": "Kalkulator", "tab_map": "Peta", "tab_report": "Lapor", "tab_help": "Bantuan", "close_button": "Tutup", "screening_title": "Screening Mandiri", "screening_desc": "Jawab pertanyaan berikut dengan jujur. Jawabanmu bersifat anonim dan hanya untuk membantumu memahami kondisimu.", "q1": "1. Dalam 3 bulan terakhir, apakah Anda pernah menggunakan obat-obatan (di luar resep dokter) untuk mengubah suasana hati?", "q2": "2. Apakah Anda merasa sulit mengontrol keinginan atau jumlah pemakaian zat tersebut?", "q3": "3. Apakah lingkungan pertemanan Anda ada yang menggunakan narkoba?", "q4": "4. Apakah Anda pernah berbohong kepada keluarga atau teman mengenai penggunaan zat?", "q5": "5. Apakah penggunaan zat tersebut mulai berdampak negatif pada sekolah, pekerjaan, atau hubungan sosial Anda?", "q6": "6. Pernahkah Anda merasa bersalah atau menyesal setelah menggunakan zat?", "q7": "7. Pernahkah orang lain (keluarga/teman) mengeluh atau mengkritik tentang kebiasaan Anda menggunakan zat?", "q8": "8. Pernahkah Anda menggunakan zat di pagi hari untuk memulai hari atau menghilangkan rasa tidak nyaman?", "q9": "9. Apakah Anda pernah gagal dalam mencoba berhenti atau mengurangi penggunaan zat?", "q10": "10. Apakah Anda pernah mengabaikan tanggung jawab (sekolah, kerja, keluarga) karena penggunaan zat?", "yes": "Ya", "no": "Tidak", "screening_submit": "Lihat Hasil Screening", "result_low_title": "Hasil: Risiko Rendah (Sehat)", "result_low_desc": "Berdasarkan jawabanmu, kamu berada dalam kategori risiko rendah. Ini adalah kondisi yang sangat baik. Pertahankan gaya hidup sehatmu dan teruslah bergaul di lingkungan yang positif!", "result_medium_title": "Hasil: Risiko Sedang (Waspada)", "result_medium_desc": "Jawabanmu menunjukkan adanya beberapa faktor risiko. Ini adalah tanda untuk lebih waspada. Cobalah untuk mengurangi pergaulan di lingkungan yang berisiko dan perbanyak kegiatan positif. Jika merasa khawatir, jangan ragu untuk berbicara dengan orang yang kamu percaya.", "result_high_title": "Hasil: Risiko Tinggi (Segera Cari Bantuan)", "result_high_desc": "Hasil screening menunjukkan kamu berada dalam kategori risiko tinggi. Jangan panik, ini bukan akhir segalanya. Ini adalah langkah pertama untuk menyadari bahwa kamu butuh bantuan. Sangat disarankan untuk segera berbicara dengan profesional. Klik tombol 'Bantuan' untuk melihat daftar kontak yang bisa dihubungi.", "screening_reset": "Ulangi Screening", "emergency_confirm_title": "Konfirmasi Panggilan Darurat", "emergency_confirm_desc": "Anda akan melakukan panggilan ke nomor darurat 112. Lanjutkan?", "emergency_cancel": "Batal", "emergency_call": "Ya, Panggil", "calculator_title": "Kalkulator Kecanduan Nikotin", "calculator_desc": "Masukkan data untuk mengetahui tingkat kecanduan nikotin Anda.", "calculator_nicotine_level": "Kadar Nikotin (mg)", "calculator_usage_days": "Jumlah Pemakaian (hari)", "calculator_button": "Hitung Kecanduan", "result_nicotine_low": "Hasil: Tidak Kecanduan", "result_nicotine_low_desc": "Berdasarkan data yang Anda berikan, Anda tidak menunjukkan tanda-tanda kecanduan nikotin. Pertahankan gaya hidup sehat Anda!", "result_nicotine_medium": "Hasil: Berisiko Kecanduan", "result_nicotine_medium_desc": "Hasil menunjukkan Anda berisiko kecanduan nikotin. Dampak: peningkatan detak jantung, tekanan darah naik, dan perubahan suasana hati. Segera kurangi pemakaian.", "result_nicotine_high": "Hasil: Kecanduan Berat", "result_nicotine_high_desc": "Hasil menunjukkan Anda sudah sangat kecanduan nikotin. Dampak: kerusakan paru-paru, risiko kanker, dan masalah jantung. Sangat disarankan untuk segera mencari bantuan profesional." }
         };
 
         // --- CORE APP LOGIC ---
@@ -414,9 +429,10 @@
         function hideEmergencyConfirmation() { emergencyModal.classList.add('hidden'); }
         function makeEmergencyCall() { window.location.href = 'tel:112'; hideEmergencyConfirmation(); }
 
-        const tabs = ['chat', 'screening', 'nikotin', 'lapor', 'bantuan'];
+        const tabs = ['chat', 'screening', 'kalkulator', 'peta', 'lapor', 'bantuan'];
         const tabButtons = {};
         const tabContents = {};
+        let mapInitialized = false;
 
         tabs.forEach(tab => {
             tabButtons[tab] = document.getElementById(`tab-${tab}`);
@@ -430,6 +446,18 @@
             });
             tabContents[tabName].classList.remove('hidden');
             tabButtons[tabName].classList.add('tab-icon-active');
+            if (tabName === 'peta' && !mapInitialized) { initMap(); mapInitialized = true; }
+        }
+
+        function initMap() {
+            const sidoarjoCoords = [-7.4478, 112.7183];
+            const map = L.map('map').setView(sidoarjoCoords, 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
+            const yellowIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
+            const greenIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
+            L.marker([-7.455, 112.715], {icon: yellowIcon}).addTo(map).bindPopup('<b>Contoh Zona Perhatian</b><br>Area ini memerlukan kewaspadaan bersama.');
+            L.marker([-7.444, 112.720], {icon: greenIcon}).addTo(map).bindPopup('<b>Alun-Alun Sidoarjo</b><br>Pusat kegiatan positif dan komunitas.');
+            L.marker([-7.430, 112.710], {icon: greenIcon}).addTo(map).bindPopup('<b>GOR Delta Sidoarjo</b><br>Area untuk kegiatan olahraga.');
         }
 
         const chatWindow = document.getElementById('chat-window');
@@ -451,7 +479,6 @@
                 hideTypingIndicator();
                 appendMessage(botResponse, 'bot');
             } catch (error) {
-                console.error("Error fetching bot response:", error);
                 hideTypingIndicator();
                 appendMessage('Maaf, terjadi kesalahan saat menghubungi AI. Coba lagi nanti.', 'bot');
             } finally {
@@ -463,12 +490,8 @@
         
         async function sendQuickAction(key) {
             const currentLang = localStorage.getItem('language') || 'id';
-            
-            // Check if the current language exists in translations
-            const langDict = translations[currentLang];
-            const displayedText = (langDict && langDict[key]) ? langDict[key] : key;
-
-            const questionInEnglish = (translations['en'] && translations['en'][key]) ? translations['en'][key] : key;
+            const displayedText = translations[currentLang]?.[key] || key;
+            const questionInEnglish = translations['en']?.[key] || key;
 
             appendMessage(displayedText, 'user');
             chatInput.disabled = true;
@@ -479,7 +502,6 @@
                 hideTypingIndicator();
                 appendMessage(botResponse, 'bot');
             } catch (error) {
-                console.error("Error fetching quick action response:", error);
                 hideTypingIndicator();
                 appendMessage('Maaf, terjadi kesalahan saat menghubungi AI. Coba lagi nanti.', 'bot');
             } finally {
@@ -518,10 +540,10 @@
 
         async function getBotResponse(userInput) {
             const currentLang = localStorage.getItem('language') || 'id';
-            const systemPrompt = `Anda adalah chatbot AI resmi dari BNN Sidoarjo. Jawab pertanyaan pengguna dalam bahasa ${currentLang === 'id' ? 'Indonesia' : 'English'}. Konteks: bahaya narkoba, rehabilitasi, hukum di Indonesia, cara hidup sehat. Jawab dengan empatik dan faktual. Jika ada krisis, sarankan hubungi hotline di menu Bantuan. Berikan jawaban yang ringkas dan padat.`;
+            const systemPrompt = `Anda adalah "BNN AI", chatbot ramah dari BNN Sidoarjo. Jawab pertanyaan pengguna dalam bahasa ${currentLang === 'id' ? 'Indonesia' : 'English'}. Konteks: bahaya narkoba, rehabilitasi, hukum di Indonesia, cara hidup sehat. Jawab dengan empatik dan faktual. Jika ada krisis, sarankan hubungi hotline di menu Bantuan.`;
             
             const chatHistory = [{ role: "user", parts: [{ text: systemPrompt + "\n\nPertanyaan Pengguna: " + userInput }] }];
-            const apiKey = "";
+            const apiKey = "AIzaSyCCNIfFkPr3DlhBIJ9JljyD7P5GgFyTcA4";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             const payload = { contents: chatHistory, generationConfig: { temperature: 0.7, topK: 1, topP: 1, maxOutputTokens: 8192 } };
 
@@ -579,6 +601,7 @@
 
         function applyLanguage(lang) {
             document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             const elements = document.querySelectorAll('[data-translate-key]');
             elements.forEach(el => {
                 const key = el.getAttribute('data-translate-key');
@@ -593,10 +616,7 @@
             langButtons.forEach(btn => {
                 btn.classList.remove('lang-btn-active');
             });
-            const activeLangBtn = document.getElementById(`lang-btn-${lang}`);
-            if (activeLangBtn) {
-                activeLangBtn.classList.add('lang-btn-active');
-            }
+            document.getElementById(`lang-btn-${lang}`).classList.add('lang-btn-active');
         }
 
         function changeLanguage(lang) {
@@ -656,141 +676,42 @@
             });
         }
         
-        // --- NIKOTIN CALCULATOR LOGIC ---
+        // --- NICOTINE CALCULATOR LOGIC ---
         function calculateNicotineAddiction() {
             const nicotineLevel = parseFloat(document.getElementById('nicotine-level').value);
-            const cigaretteCount = parseFloat(document.getElementById('cigarette-count').value);
-            const duration = parseFloat(document.getElementById('duration').value);
-            const durationUnit = document.getElementById('duration-unit').value;
-            const resultDiv = document.getElementById('nicotine-result');
+            const usageDays = parseInt(document.getElementById('usage-days').value);
+            const resultContainer = document.getElementById('nicotine-result');
 
-            if (isNaN(nicotineLevel) || isNaN(cigaretteCount) || isNaN(duration) || nicotineLevel <= 0 || cigaretteCount <= 0 || duration <= 0) {
-                showModal('Mohon isi semua kolom dengan angka yang valid.');
+            if (isNaN(nicotineLevel) || isNaN(usageDays) || nicotineLevel < 0 || usageDays < 0) {
+                showModal('Mohon masukkan angka yang valid untuk kadar nikotin dan jumlah pemakaian.');
                 return;
             }
 
-            let totalDays = 0;
-            if (durationUnit === 'days') totalDays = duration;
-            if (durationUnit === 'weeks') totalDays = duration * 7;
-            if (durationUnit === 'months') totalDays = duration * 30.44; // average days in a month
-            if (durationUnit === 'years') totalDays = duration * 365.25;
+            let resultTitleKey, resultDescKey, bgColor;
+            const totalNicotine = nicotineLevel * usageDays;
 
-            const totalNicotine = nicotineLevel * cigaretteCount * totalDays;
-            
-            let resultText = '';
-            let addictionLevel = '';
-            let impacts = '';
-
-            if (totalNicotine < 500) {
-                addictionLevel = 'Risiko Rendah';
-                impacts = 'Dampak: Perokok sesekali, risiko kesehatan rendah. Namun, tetap berisiko menjadi kecanduan. Disarankan untuk segera berhenti total.';
-            } else if (totalNicotine >= 500 && totalNicotine < 5000) {
-                addictionLevel = 'Kecanduan Ringan';
-                impacts = 'Dampak: Mulai merasakan gejala kecanduan seperti keinginan kuat untuk merokok. Berisiko tinggi mengalami gangguan pernapasan dan jantung. Upayakan untuk mengurangi dan berhenti total.';
-            } else if (totalNicotine >= 5000 && totalNicotine < 10000) {
-                addictionLevel = 'Kecanduan Sedang';
-                impacts = 'Dampak: Ketergantungan psikologis dan fisik kuat terhadap nikotin. Risiko penyakit kronis meningkat tajam. Sangat disarankan untuk mencari bantuan profesional dari BNN atau klinik rehabilitasi.';
+            if (totalNicotine < 100) {
+                resultTitleKey = 'result_nicotine_low';
+                resultDescKey = 'result_nicotine_low_desc';
+                bgColor = 'bg-green-100 border-green-500 text-green-800';
+            } else if (totalNicotine >= 100 && totalNicotine < 500) {
+                resultTitleKey = 'result_nicotine_medium';
+                resultDescKey = 'result_nicotine_medium_desc';
+                bgColor = 'bg-yellow-100 border-yellow-500 text-yellow-800';
             } else {
-                addictionLevel = 'Kecanduan Berat';
-                impacts = 'Dampak: Ketergantungan sangat kuat. Risiko penyakit parah seperti kanker paru-paru, penyakit jantung koroner, dan stroke sangat tinggi. Segera cari bantuan medis dan rehabilitasi. Hubungi BNN Sidoarjo.';
+                resultTitleKey = 'result_nicotine_high';
+                resultDescKey = 'result_nicotine_high_desc';
+                bgColor = 'bg-red-100 border-red-500 text-red-800';
             }
 
-            resultText = `
-                <h3 class="font-bold text-xl mb-2">Hasil Analisis</h3>
-                <p><strong>Tingkat Kecanduan:</strong> <span class="text-blue-600 font-semibold">${addictionLevel}</span></p>
-                <p class="mt-4"><strong>Total Nikotin yang Dikonsumsi:</strong> ${totalNicotine.toFixed(2)} mg</p>
-                <p class="mt-4"><strong>Dampak dan Saran:</strong></p>
-                <p class="mt-1 text-sm text-slate-600">${impacts}</p>
+            const currentLang = localStorage.getItem('language') || 'id';
+            resultContainer.innerHTML = `
+                <div class="p-4 rounded-lg border ${bgColor}">
+                    <h3 class="font-bold text-lg">${translations[currentLang][resultTitleKey]}</h3>
+                    <p class="mt-2 text-sm">${translations[currentLang][resultDescKey]}</p>
+                </div>
             `;
-
-            resultDiv.innerHTML = resultText;
-            resultDiv.classList.remove('hidden');
-        }
-        
-        // --- FIREBASE LOGIC ---
-        let db, storage, auth;
-        const firebaseConfig = {
-            apiKey: "AIzaSyDZj0MOTzgbYUKZN9Rk7-ljfqperQU2fuo",
-            authDomain: "aplikasi-bnn-sidoarjo.firebaseapp.com",
-            projectId: "aplikasi-bnn-sidoarjo",
-            storageBucket: "aplikasi-bnn-sidoarjo.firebasestorage.app",
-            messagingSenderId: "153139151361",
-            appId: "1:153139151361:web:839aa8f5f5758cc8883600",
-            measurementId: "G-BJBZB4TZ6G"
-        };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        async function initFirebase() {
-            try {
-                // Check if Firebase is already initialized
-                if (typeof db !== 'undefined' && typeof storage !== 'undefined' && typeof auth !== 'undefined') {
-                    console.log("Firebase already initialized.");
-                    return;
-                }
-
-                // Check for canvas-provided config
-                const configToUse = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
-
-                const app = initializeApp(configToUse);
-                db = getFirestore(app);
-                storage = getStorage(app);
-                auth = getAuth(app);
-                
-                const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                if (authToken) {
-                    await signInWithCustomToken(auth, authToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                console.log("Signed in to Firebase successfully.");
-            } catch (error) {
-                console.error("Error initializing Firebase:", error);
-                showModal("Terjadi kesalahan saat menginisialisasi layanan. Fitur Lapor mungkin tidak berfungsi.");
-            }
-        }
-
-        async function kirimLaporan() {
-            if (!db || !storage) {
-                showModal("Layanan basis data tidak tersedia. Mohon coba lagi.");
-                return;
-            }
-
-            const nama = document.getElementById('lapor-nama').value;
-            const telepon = document.getElementById('lapor-telepon').value;
-            const deskripsi = document.getElementById('lapor-deskripsi').value;
-            const lokasi = document.getElementById('lapor-lokasi').value;
-            const ktpFile = document.getElementById('lapor-ktp').files[0];
-
-            if (!deskripsi || !lokasi || !ktpFile) {
-                showModal('Deskripsi kejadian, lokasi kejadian, dan foto KTP wajib diisi.');
-                return;
-            }
-
-            try {
-                // Upload KTP to Firebase Storage
-                const userId = auth.currentUser ? auth.currentUser.uid : 'anon';
-                const ktpRef = ref(storage, `laporan_ktp/${userId}/${Date.now()}-${ktpFile.name}`);
-                const snapshot = await uploadBytes(ktpRef, ktpFile);
-                const ktpUrl = await getDownloadURL(snapshot.ref);
-
-                // Save report data to Firestore
-                const laporanCollection = collection(db, `artifacts/${appId}/public/data/laporan`);
-                await addDoc(laporanCollection, {
-                    nama: nama || 'Anonim',
-                    telepon: telepon || 'Tidak diisi',
-                    deskripsi: deskripsi,
-                    lokasi: lokasi,
-                    ktpUrl: ktpUrl,
-                    userId: userId, // save user ID with the report
-                    timestamp: serverTimestamp()
-                });
-
-                showModal('Laporan Anda berhasil dikirim! Terima kasih atas partisipasinya.');
-                document.getElementById('lapor-form').reset();
-            } catch (e) {
-                console.error("Error adding document or uploading file: ", e);
-                showModal("Terjadi kesalahan saat mengirim laporan. Silakan coba lagi.");
-            }
+            resultContainer.classList.remove('hidden');
         }
 
 
@@ -803,9 +724,6 @@
             showTab('chat'); 
             updateDateTime();
             setInterval(updateDateTime, 60000); 
-
-            // Initialize Firebase
-            initFirebase();
         };
     </script>
 </body>
